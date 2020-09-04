@@ -14,9 +14,15 @@ led = Pin(Map.LED_BUILTIN, Pin.OUT)
 lcd = LCD()
 lcd.fillScreen(lcd.color.BLACK)
 lcd.setTextColor(lcd.color.WHITE, lcd.color.BLACK)
-lcd.drawString("RPI Monitor", 10, 10)
+
+r = 0
 
 while True:
+
+    lcd.setRotation(r)
+    lcd.drawString("RPI Monitor", 50, 50)
+    r = r + 1
+
     led.on()
     time.sleep(0.3)
     led.off()

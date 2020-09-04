@@ -4,14 +4,56 @@ This class is useful when you need to test your code without physical device
 
 based on: https://wiki.seeedstudio.com/ArduPy-LCD/
 '''
+
+import pygame
+import threading
+
 class LCD:
 	
 	class color:
-		BLACK = (255, 0, 0, 0)
-		WHITE = (255, 255, 255, 255)
+		BLACK = (0, 0, 0)
+		WHITE = (255, 255, 255)
+
+	FPS = 3
 
 	width = 320
 	height = 240
+
+	_screen = None
+	_clock = None
+
+	_rotation = None
+	_screenColor = (0, 0, 0)
+
+	def __init__(self):
+		super().__init__()
+
+		pygame.init()
+
+		self._screen = pygame.display.set_mode((self.width, self.height))
+		self._screen.fill(self._screenColor)
+		self._clock = pygame.time.Clock()
+
+		threading.Thread(target=self._refreshThread).start()
+
+	def _refreshThread(self):
+		done = False
+		while not done:
+			for event in pygame.event.get():
+				if event.type == pygame.QUIT:
+					done = True
+			self._draw()
+			pygame.display.update()
+			self._clock.tick(self.FPS)
+
+	def _draw(self):
+
+		self._screen.fill(self._screenColor)
+
+		# REMOVE:
+		pygame.draw.rect(self._screen, (0, 128, 255), pygame.Rect(30, 30, 60, 60))
+		
+		self._applyRotation()
 
 	def color16to8(self, color):
 		pass
@@ -29,7 +71,30 @@ class LCD:
 		pass
 
 	def setRotation(self, r):
-		pass
+		"""Set virtual display rotation
+
+        Parameters
+        ----------
+        r : int
+            Rotation (0: rotate 0 degrees, 1: rotate 90 degrees, 2: rotate 180 degrees, 3: rotate 270 degrees)
+        """
+		self._rotation = r
+
+	def _applyRotation(self):
+		if self._rotation is not None:
+			angle = 0
+			normalizedRotation = self._rotation - (self._rotation // 4) * 4
+
+			if normalizedRotation == 0:
+				angle = 0
+			elif normalizedRotation == 1:
+				angle = 90
+			elif normalizedRotation == 2:
+				angle = 180
+			elif normalizedRotation == 3:
+				angle = 270
+			
+			self._screen.blit(pygame.transform.rotate(self._screen, angle), (0, 0))
 
 	def setTextColor(self, color):
 		pass
@@ -37,10 +102,10 @@ class LCD:
 	def setTextColor(self, fgColor, bgColor):
 		pass
 
-	def drawCentreString(self, string, dX, poY, font):
+	def drawCentreString(self, string, dX, poY, font = None):
 		pass
 
-	def drawString(self, string, poX, poY, font): 
+	def drawString(self, string, poX, poY, font = None): 
 		pass
 
 	def drawChar(self, char, poX, poY):
@@ -101,6 +166,7 @@ class LCD:
 		pass
 
 	def fillScreen(self, color):
+		self._screenColor = color
 		pass
 
 	def invertDisplay(self, n):
