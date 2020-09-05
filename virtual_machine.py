@@ -25,11 +25,17 @@ class LCD:
 	_rotation = None
 	_screenColor = (0, 0, 0)
 
+	_textColor = color.WHITE
+	_textBgColor = color.BLACK
+	_fontSize = 12
+	_font = None
+
 	def __init__(self):
 		super().__init__()
 
 		pygame.init()
 
+		self._font = pygame.font.Font(pygame.font.get_default_font(), self._fontSize)
 		self._screen = pygame.display.set_mode((self.width, self.height))
 		self._screen.fill(self._screenColor)
 		self._clock = pygame.time.Clock()
@@ -48,10 +54,7 @@ class LCD:
 
 	def _draw(self):
 
-		self._screen.fill(self._screenColor)
-
-		# REMOVE:
-		pygame.draw.rect(self._screen, (0, 128, 255), pygame.Rect(30, 30, 60, 60))
+		#self._screen.fill(self._screenColor)
 		
 		self._applyRotation()
 
@@ -80,33 +83,19 @@ class LCD:
         """
 		self._rotation = r
 
-	def _applyRotation(self):
-		if self._rotation is not None:
-			angle = 0
-			normalizedRotation = self._rotation - (self._rotation // 4) * 4
-
-			if normalizedRotation == 0:
-				angle = 0
-			elif normalizedRotation == 1:
-				angle = 90
-			elif normalizedRotation == 2:
-				angle = 180
-			elif normalizedRotation == 3:
-				angle = 270
-			
-			self._screen.blit(pygame.transform.rotate(self._screen, angle), (0, 0))
-
 	def setTextColor(self, color):
-		pass
+		self._textColor = color
 
 	def setTextColor(self, fgColor, bgColor):
-		pass
+		self._textColor = fgColor
+		self._textBgColor = bgColor
 
 	def drawCentreString(self, string, dX, poY, font = None):
 		pass
 
 	def drawString(self, string, poX, poY, font = None): 
-		pass
+		text_surface = self._font.render(string, True, self._textColor)
+		self._screen.blit(text_surface, dest=(poX,poY))
 
 	def drawChar(self, char, poX, poY):
 		pass
@@ -129,8 +118,8 @@ class LCD:
 	def drawFloat(self, floatNumber, decimal, x, y , font):
 		pass
 
-	def drawLine(self, x, y, x1, x2, color):
-		pass
+	def drawLine(self, x, y, x1, y1, color):
+		pygame.draw.line(self._screen, color, (x, y), (x1, y1))
 
 	def drawNumber(self, number, x, y, font):
 		pass
@@ -182,10 +171,27 @@ class LCD:
 		pass
 
 	def setTextSize(self, size):
-		pass
+		self._fontSize = size
+		self._font = pygame.font.Font(pygame.font.get_default_font(), self._fontSize)
 
 	def textWidth(self, string):
 		pass
+
+	def _applyRotation(self):
+		if self._rotation is not None:
+			angle = 0
+			normalizedRotation = self._rotation - (self._rotation // 4) * 4
+
+			if normalizedRotation == 0:
+				angle = 0
+			elif normalizedRotation == 1:
+				angle = 90
+			elif normalizedRotation == 2:
+				angle = 180
+			elif normalizedRotation == 3:
+				angle = 270
+			
+			self._screen.blit(pygame.transform.rotate(self._screen, angle), (0, 0))
 
 class Pin:
 
