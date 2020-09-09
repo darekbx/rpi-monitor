@@ -47,6 +47,8 @@ class LCD:
 	_fontSize = 12
 	_font = None
 
+	keyCallback = None
+
 	def __init__(self):
 		super().__init__()
 
@@ -65,9 +67,21 @@ class LCD:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
 					done = True
+				if event.type == pygame.KEYDOWN:
+					if event.key == pygame.K_a:
+						self._keyPressed('A')
+					if event.key == pygame.K_b:
+						self._keyPressed('B')
+					if event.key == pygame.K_c:
+						self._keyPressed('C')
+
 			self._draw()
 			pygame.display.update()
 			self._clock.tick(self.FPS)
+
+	def _keyPressed(self, key):
+		if self.keyCallback is not None:
+			self.keyCallback(key)
 
 	def _draw(self):
 
@@ -108,7 +122,10 @@ class LCD:
 		self._textBgColor = bgColor
 
 	def drawCentreString(self, string, dX, poY, font = None):
-		raise Exception("Not implemented")
+		text_surface = self._font.render(string, True, self._textColor)
+		text_width, text_height = self._font.size(string)
+		pygame.draw.rect(self._screen, self._textBgColor, [dX, poY, text_width, text_height]) 
+		self._screen.blit(text_surface, dest=(dX - text_width / 2, poY - text_height / 2))
 
 	def drawString(self, string, poX, poY, font = None): 
 		text_surface = self._font.render(string, True, self._textColor)
@@ -213,16 +230,23 @@ class LCD:
 
 class Pin:
 
+	PULL_UP = 1
+
 	OUT = "pin_output"
 	IN = "pin_input"
 
 	_pin = None
 	_mode = None
 
-	def __init__(self, pin, mode):
+	_value = None
+
+	def __init__(self, pin, mode, pull_up):
 		super().__init__()
 		self._pin = pin
 		self._mode = mode
+
+	def value(self):
+		return self._value
 		
 	def on(self):
 		raise Exception("Not implemented")
@@ -230,14 +254,5 @@ class Pin:
 	def off(self):
 		raise Exception("Not implemented")
 
-class Map:
-
-	LED_BUILTIN = 50
-	WIO_KEY_A = 55
-	WIO_KEY_B = 56
-	WIO_KEY_C = 57
-	WIO_5S_LEFT = 59
-	WIO_5S_RIGHT = 60
-	WIO_5S_UP = 58
-	WIO_5S_DOWN = 61
-	WIO_5S_PRESS = 62
+	def setValue(self, value):
+		self._value = value
