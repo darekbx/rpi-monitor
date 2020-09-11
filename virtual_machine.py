@@ -31,7 +31,7 @@ class LCD:
 		WHITE = (255, 255, 255)
 		RED = (255, 0, 0)
 		
-	FPS = 3
+	FPS = 10
 
 	width = 320
 	height = 240
@@ -69,19 +69,30 @@ class LCD:
 					done = True
 				if event.type == pygame.KEYDOWN:
 					if event.key == pygame.K_a:
-						self._keyPressed('A')
+						self._keyDown('A')
 					if event.key == pygame.K_b:
-						self._keyPressed('B')
+						self._keyDown('B')
 					if event.key == pygame.K_c:
-						self._keyPressed('C')
+						self._keyDown('C')
+				if event.type == pygame.KEYUP:
+					if event.key == pygame.K_a:
+						self._keyUp('A')
+					if event.key == pygame.K_b:
+						self._keyUp('B')
+					if event.key == pygame.K_c:
+						self._keyUp('C')
 
 			self._draw()
 			pygame.display.update()
 			self._clock.tick(self.FPS)
 
-	def _keyPressed(self, key):
+	def _keyDown(self, key):
 		if self.keyCallback is not None:
-			self.keyCallback(key)
+			self.keyCallback(key, True)
+	
+	def _keyUp(self, key):
+		if self.keyCallback is not None:
+			self.keyCallback(key, False)
 
 	def _draw(self):
 
@@ -206,7 +217,7 @@ class LCD:
 		raise Exception("Not implemented")
 
 	def setTextSize(self, size):
-		self._fontSize = size
+		self._fontSize = size * 10
 		self._font = pygame.font.Font(pygame.font.get_default_font(), self._fontSize)
 
 	def textWidth(self, string):

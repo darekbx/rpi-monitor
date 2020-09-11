@@ -35,12 +35,15 @@ class MainMenu:
 			lcd.keyCallback = self.keyCallback
 
 		while True:
-			self.drawMenuButton(lcd, KeyMap.WIO_KEY_A, "MENU", 0)
-			self.drawMenuButton(lcd, KeyMap.WIO_KEY_B, "LOCK", 1)
-			self.drawMenuButton(lcd, KeyMap.WIO_KEY_C, "WIFI", 2)
+			self.drawMenuButton(lcd, KeyMap.WIO_KEY_A, "CHECK", 0)
+			self.drawMenuButton(lcd, KeyMap.WIO_KEY_B, "NEXT", 1)
+			self.drawMenuButton(lcd, KeyMap.WIO_KEY_C, "RESET", 2)
 
 			lcd.setTextColor(LCD.color.WHITE, LCD.color.BLACK)
-			lcd.drawCentreString("Terminal", 150, 110)
+
+			lcd.setTextSize(2)
+			lcd.drawString("13 * 5 + 8 = ?", 50, 70)
+			lcd.setTextSize(1)
 
 			lcd.drawLine(int(60), int(0), int(60), int(20), LCD.color.WHITE)
 			lcd.drawLine(int(120), int(0), int(120), int(20), LCD.color.WHITE)
@@ -61,21 +64,21 @@ class MainMenu:
 			lcd.fillRect(index * 60, 0, 60, 20, LCD.color.DARKGREY)
 		lcd.drawString(title, index * 60 + 5, 5)
 
-	# Baypass pygame keyboar input to pin
+	# Baypass pygame keyboard input to pin
 	# Method only for virtual machine
 	_state_map = { }
-	def keyCallback(self, key):
+	def keyCallback(self, key, isDown):
+		state = KeyMap.HIGH if isDown else KeyMap.LOW
 		if key == 'A':
-			self._state_map[KeyMap.WIO_KEY_A] = KeyMap.HIGH 
+			self._state_map[KeyMap.WIO_KEY_A] = state
 		elif key == 'B':
-			self._state_map[KeyMap.WIO_KEY_B] = KeyMap.HIGH
+			self._state_map[KeyMap.WIO_KEY_B] = state
 		elif key == 'C':
-			self._state_map[KeyMap.WIO_KEY_C] = KeyMap.HIGH
+			self._state_map[KeyMap.WIO_KEY_C] = state
 
 	def setValue(self, pin, key):
 		if key in self._state_map:
 			pin.setValue(self._state_map[key])
-			del self._state_map[key]
 	
 	def dump(self, lcd):
 		x = 5
